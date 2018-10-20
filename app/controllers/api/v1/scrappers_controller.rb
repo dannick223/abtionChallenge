@@ -2,6 +2,8 @@ module Api
   module V1
     class ScrappersController < ApplicationController
       def index
+        # Checks if parameters for dates are present, if not set dates to current date.
+        # Check if date is earlier than current date and check if date is not older than 2 days.
         if params.key?(:flight_time)
           event = params[:flight_time]
           d = Date.new event['date(1i)'].to_i,
@@ -20,6 +22,8 @@ module Api
           @date_error = ''
         end
 
+        # Check if the time parameter is present if not set time to 00:00
+        # Check if parameter is an integer
         if params.key?(:time)
           t = params[:time]
           t.is_a? Integer
@@ -28,13 +32,19 @@ module Api
           time = '00'
         end
 
-        @date_fomatted = 'test'
-        @type = params[:type]
-        baseurl = if @type == 'Afgange'
+        # Set baseurl depending of the type parameter.
+        # fallback to first option incase of breakage.
+        # use the gem HTTParty to fetch the html of baseurl
+        # use the gem nokogiri to render the html as requested on the view
+        type = params[:type]
+        baseurl = if type == 'Afgange'
+                    flash[:type] = "Searching for afgange"
                     'https://www.cph.dk/flyinformation/afgange'
-                  elsif @type == 'Ankomster'
+                  elsif type == 'Ankomster'
+                    flash[:type] = "Post successfully ankomster"
                     'https://www.cph.dk/flyinformation/ankomster'
                   else
+                    flash[:type] = "Searching for afgange"
                     'https://www.cph.dk/flyinformation/afgange'
                   end
         html = HTTParty.get(baseurl.to_s,

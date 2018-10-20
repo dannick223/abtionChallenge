@@ -2,9 +2,8 @@
   <div class="jumbotron">
     <h1 class="display-3">Søg efter flyinformation</h1>
     <hr class="m-y-md">
-
     <%= form_tag request.original_url, method: :get, class: "navbar-form navbar-left search-form" do %>
-    <%= text_field_tag( :q, params[:q], placeholder: "Søg... ", class: "form-control" ) %>
+    <%= text_field_tag( :q, params[:q], placeholder: "Search for country or city Hamburg etc. ", class: "form-control" ) %>
     <%= select_tag "type", options_for_select([ "Afgange", "Ankomster" ],"Afgange"), class: "" %>
     <%= date_select("flight_time", "date") %>
     <%= select_tag "time", options_for_select([ "00","01","02","03","04","05","06","07","08","09","10", "11","12","13","14","15","16","17","18","19","20","21", "22","23","24" ],"00"), class: "" %>
@@ -16,8 +15,11 @@
     <thead>
       <% unless @date_error.length > 0  %>
         <p>Searching from:
-          <%= @date %></p>
+        <%= @date %></p>
       <% end  %>
+      <% if flash[:type] %>
+      <p><%= flash[:type] %></p>
+      <% end %>
       <tr>
         <th scope="col">Time</th>
         <th scope="col">Company</th>
@@ -45,24 +47,25 @@
                 @gate = flight.css('div.flights__table__col--gate span').text end %>
               <td>
               <%= if flight.css('span').count == 13
-                  if flight.css('span')[11].text.length == 0
-                     @status = "No status available"
-                  else
-                     @status = flight.css('span')[11].text
-                  end
+                    if flight.css('span')[11].text.length == 0
+                       @status = "No status available"
+                    else
+                       @status = flight.css('span')[11].text
+                    end
                  elsif
-                    flight.css('span').count == 11
+                   flight.css('span').count == 11
                      if flight.css('span')[9].text.length == 0
                         @status = "No status available"
-                     else @status = flight.css('span')[9].text
+                     else
+                        @status = flight.css('span')[9].text
                      end
                  end %>
               </td>
             </tr>
-            <%
-       end
-       else
-    %>
+           <%
+           end
+           else
+           %>
               <tr>
                 <th scope="row"><%= @date_error %></th>
               </tr>
